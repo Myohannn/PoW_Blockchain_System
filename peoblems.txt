@@ -1,0 +1,10 @@
+In Miner class:
+- adjustDiffculty: how to adjust difficulty?
+
+- key generation: saved and loaded are different
+
+
+- valid block?
+- valid transaction?
+
+
