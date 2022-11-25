@@ -163,8 +163,6 @@ def getTimestamp():
 
 
 def genUTXOs(blocks):
-    print(blocks)
-
     txOutDict = {}
     txInList = []
     for block in blocks:
