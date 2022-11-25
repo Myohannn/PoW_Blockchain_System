@@ -24,16 +24,6 @@ class BlockChainStub(object):
         request_serializer=grpc__utils_dot_blockchain__pb2.AddBlockRequest.SerializeToString,
         response_deserializer=grpc__utils_dot_blockchain__pb2.AddBlockResponse.FromString,
         )
-    self.QueryBlockchain = channel.unary_unary(
-        '/BlockChain/QueryBlockchain',
-        request_serializer=grpc__utils_dot_blockchain__pb2.QueryBlockchainRequest.SerializeToString,
-        response_deserializer=grpc__utils_dot_blockchain__pb2.QueryBlockchainResponse.FromString,
-        )
-    self.QueryBlock = channel.unary_unary(
-        '/BlockChain/QueryBlock',
-        request_serializer=grpc__utils_dot_blockchain__pb2.QueryBlockRequest.SerializeToString,
-        response_deserializer=grpc__utils_dot_blockchain__pb2.QueryBlockResponse.FromString,
-        )
     self.receiveBlock = channel.unary_unary(
         '/BlockChain/receiveBlock',
         request_serializer=grpc__utils_dot_blockchain__pb2.ReceiveBlockRequest.SerializeToString,
@@ -54,25 +44,20 @@ class BlockChainStub(object):
         request_serializer=grpc__utils_dot_blockchain__pb2.getStateRequest.SerializeToString,
         response_deserializer=grpc__utils_dot_blockchain__pb2.getStateResponse.FromString,
         )
-    self.getchain = channel.unary_unary(
-        '/BlockChain/getchain',
-        request_serializer=grpc__utils_dot_blockchain__pb2.getchainRequest.SerializeToString,
-        response_deserializer=grpc__utils_dot_blockchain__pb2.getchainResponse.FromString,
+    self.QueryDB = channel.unary_unary(
+        '/BlockChain/QueryDB',
+        request_serializer=grpc__utils_dot_blockchain__pb2.QueryDBRequest.SerializeToString,
+        response_deserializer=grpc__utils_dot_blockchain__pb2.QueryDBResponse.FromString,
+        )
+    self.addNewTransaction = channel.unary_unary(
+        '/BlockChain/addNewTransaction',
+        request_serializer=grpc__utils_dot_blockchain__pb2.addNewTransactionRequest.SerializeToString,
+        response_deserializer=grpc__utils_dot_blockchain__pb2.addNewTransactionResponse.FromString,
         )
     self.sendTransaction = channel.unary_unary(
         '/BlockChain/sendTransaction',
         request_serializer=grpc__utils_dot_blockchain__pb2.sendTransactionRequest.SerializeToString,
         response_deserializer=grpc__utils_dot_blockchain__pb2.sendTransactionResponse.FromString,
-        )
-    self.addNewtransaction = channel.unary_unary(
-        '/BlockChain/addNewtransaction',
-        request_serializer=grpc__utils_dot_blockchain__pb2.addNewRequest.SerializeToString,
-        response_deserializer=grpc__utils_dot_blockchain__pb2.addNewResponse.FromString,
-        )
-    self.QueryDB = channel.unary_unary(
-        '/BlockChain/QueryDB',
-        request_serializer=grpc__utils_dot_blockchain__pb2.QueryDBRequest.SerializeToString,
-        response_deserializer=grpc__utils_dot_blockchain__pb2.QueryDBResponse.FromString,
         )
 
 
@@ -90,20 +75,6 @@ class BlockChainServicer(object):
   def addNewBlock(self, request, context):
     # missing associated documentation comment in .proto file
     pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def QueryBlockchain(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def QueryBlock(self, request, context):
-    """For step 3
-    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -136,7 +107,14 @@ class BlockChainServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def getchain(self, request, context):
+  def QueryDB(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def addNewTransaction(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -144,20 +122,6 @@ class BlockChainServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def sendTransaction(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def addNewtransaction(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def QueryDB(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -176,16 +140,6 @@ def add_BlockChainServicer_to_server(servicer, server):
           servicer.addNewBlock,
           request_deserializer=grpc__utils_dot_blockchain__pb2.AddBlockRequest.FromString,
           response_serializer=grpc__utils_dot_blockchain__pb2.AddBlockResponse.SerializeToString,
-      ),
-      'QueryBlockchain': grpc.unary_unary_rpc_method_handler(
-          servicer.QueryBlockchain,
-          request_deserializer=grpc__utils_dot_blockchain__pb2.QueryBlockchainRequest.FromString,
-          response_serializer=grpc__utils_dot_blockchain__pb2.QueryBlockchainResponse.SerializeToString,
-      ),
-      'QueryBlock': grpc.unary_unary_rpc_method_handler(
-          servicer.QueryBlock,
-          request_deserializer=grpc__utils_dot_blockchain__pb2.QueryBlockRequest.FromString,
-          response_serializer=grpc__utils_dot_blockchain__pb2.QueryBlockResponse.SerializeToString,
       ),
       'receiveBlock': grpc.unary_unary_rpc_method_handler(
           servicer.receiveBlock,
@@ -207,25 +161,20 @@ def add_BlockChainServicer_to_server(servicer, server):
           request_deserializer=grpc__utils_dot_blockchain__pb2.getStateRequest.FromString,
           response_serializer=grpc__utils_dot_blockchain__pb2.getStateResponse.SerializeToString,
       ),
-      'getchain': grpc.unary_unary_rpc_method_handler(
-          servicer.getchain,
-          request_deserializer=grpc__utils_dot_blockchain__pb2.getchainRequest.FromString,
-          response_serializer=grpc__utils_dot_blockchain__pb2.getchainResponse.SerializeToString,
+      'QueryDB': grpc.unary_unary_rpc_method_handler(
+          servicer.QueryDB,
+          request_deserializer=grpc__utils_dot_blockchain__pb2.QueryDBRequest.FromString,
+          response_serializer=grpc__utils_dot_blockchain__pb2.QueryDBResponse.SerializeToString,
+      ),
+      'addNewTransaction': grpc.unary_unary_rpc_method_handler(
+          servicer.addNewTransaction,
+          request_deserializer=grpc__utils_dot_blockchain__pb2.addNewTransactionRequest.FromString,
+          response_serializer=grpc__utils_dot_blockchain__pb2.addNewTransactionResponse.SerializeToString,
       ),
       'sendTransaction': grpc.unary_unary_rpc_method_handler(
           servicer.sendTransaction,
           request_deserializer=grpc__utils_dot_blockchain__pb2.sendTransactionRequest.FromString,
           response_serializer=grpc__utils_dot_blockchain__pb2.sendTransactionResponse.SerializeToString,
-      ),
-      'addNewtransaction': grpc.unary_unary_rpc_method_handler(
-          servicer.addNewtransaction,
-          request_deserializer=grpc__utils_dot_blockchain__pb2.addNewRequest.FromString,
-          response_serializer=grpc__utils_dot_blockchain__pb2.addNewResponse.SerializeToString,
-      ),
-      'QueryDB': grpc.unary_unary_rpc_method_handler(
-          servicer.QueryDB,
-          request_deserializer=grpc__utils_dot_blockchain__pb2.QueryDBRequest.FromString,
-          response_serializer=grpc__utils_dot_blockchain__pb2.QueryDBResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

@@ -1,16 +1,8 @@
-from __future__ import print_function
-
 import logging
-import random
-import time
 import grpc
 
 import grpc_utils.blockchain_pb2 as blockchain_pb2
 import grpc_utils.blockchain_pb2_grpc as blockchain_pb2_grpc
-import ECDSA
-
-
-# The client initialization
 
 
 class bc_Miner:
@@ -18,19 +10,21 @@ class bc_Miner:
 
         self.port_list = []
         self.miner_index = minerIndex
-        self.localport = ''
+        self.localPort = ''
         self.latestBlockIndex = 1
         self.localBlockIndex = 0
 
         # self.initMiner()
 
     def run(self):
+        # initialize bc_server
         self.initMiner()
+        # Reload data from DB
         self.QueryDB()
 
-        local_channel = grpc.insecure_channel('localhost:' + self.localport)
-        resposne = self.sendMessage(local_channel, 'Local index')
-        self.localBlockIndex = int(resposne.message)
+        local_channel = grpc.insecure_channel('localhost:' + self.localPort)
+        response = self.sendMessage(local_channel, 'Local index')
+        self.localBlockIndex = int(response.message)
         self.latestBlockIndex = self.localBlockIndex
 
     def initMiner(self):
@@ -41,8 +35,6 @@ class bc_Miner:
             line = f.readline()
         f.close()
 
-        # get key pair
-
         # update server side miner_index
         local_port = self.port_list[self.miner_index]
         local_channel = grpc.insecure_channel('localhost:' + local_port)
@@ -50,12 +42,10 @@ class bc_Miner:
         response = stub.getState(blockchain_pb2.getStateRequest(message=self.miner_index))
         print(response)
 
-        self.localport = self.port_list[self.miner_index]
-
-        # self.mining()
+        self.localPort = self.port_list[self.miner_index]
 
     def QueryDB(self):
-        local_channel = grpc.insecure_channel('localhost:' + self.localport)
+        local_channel = grpc.insecure_channel('localhost:' + self.localPort)
         stub = blockchain_pb2_grpc.BlockChainStub(local_channel)
         response = stub.QueryDB(blockchain_pb2.QueryDBRequest(message='Read blockchain from DB'))
         print("Query DB result:", response)
@@ -66,7 +56,6 @@ class bc_Miner:
         # print("Live miner's latest block index", index_list)
         for idx in index_list:
             if int(idx.message) <= self.latestBlockIndex:
-                # self.latestBlockIndex = self.localBlockIndex
                 continue
             else:
                 self.latestBlockIndex = int(idx.message)
@@ -75,14 +64,6 @@ class bc_Miner:
     def broadcastMsg(self, message):
         channel_list = self.getAliveChannel(self.port_list)
         response_list = []
-
-        # # for port in port_list:
-        # #     channel = grpc.insecure_channel()
-        # channel1 = grpc.insecure_channel('localhost:50051')
-        # channel2 = grpc.insecure_channel('localhost:50052')
-        # channel3 = grpc.insecure_channel('localhost:50053')
-        #
-        # channel_list = [channel2, channel3]
 
         for c in channel_list:
             try:
@@ -93,9 +74,11 @@ class bc_Miner:
         return response_list
 
     def mining(self):
+        # main procedure of block mining
         nonce = 0
         while 1 == 1:
             if self.isMining():
+                # check whether the miner should mine or synchronize
                 print("Start mining")
                 self.mineBlock(nonce)
                 nonce += 1
@@ -103,17 +86,16 @@ class bc_Miner:
                 print(f"Getting block {self.localBlockIndex}")
                 self.getBlock(self.localBlockIndex)
                 self.getLatestBlockIdx()
-                # query next block
 
     def isMining(self):
         # check whether the mining should start mining
-        local_channel = grpc.insecure_channel('localhost:' + self.localport)
-        resposne = self.sendMessage(local_channel, 'Local index')
-        self.localBlockIndex = int(resposne.message)
+        local_channel = grpc.insecure_channel('localhost:' + self.localPort)
+        response = self.sendMessage(local_channel, 'Local index')
+        self.localBlockIndex = int(response.message)
         self.getLatestBlockIdx()
 
-        print("local:", self.localBlockIndex)
-        print("latest:", self.latestBlockIndex)
+        print("Local latest block index:", self.localBlockIndex)
+        print("Network latest block index:", self.latestBlockIndex)
         if self.localBlockIndex < self.latestBlockIndex:
             # query next block
             return False
@@ -122,8 +104,7 @@ class bc_Miner:
             return True
 
     def mineBlock(self, nonce):
-        # local_channel = implementations.insecure_channel('localhost', local_port)
-        local_channel = grpc.insecure_channel('localhost:' + self.localport)
+        local_channel = grpc.insecure_channel('localhost:' + self.localPort)
         stub = blockchain_pb2_grpc.BlockChainStub(local_channel)
 
         # initialize coinbase tx
@@ -131,7 +112,6 @@ class bc_Miner:
         # print(initTX.message)
 
         tran_msg = f"This block was added by client {self.miner_index}."
-
         response = stub.addNewBlock(blockchain_pb2.AddBlockRequest(transaction=tran_msg, nonce=nonce))
 
         # print("trying nonce:", nonce)
@@ -144,19 +124,12 @@ class bc_Miner:
             print(initTX.message)
 
             self.broadcastBlock(response.newBlock)
+            # if mined a block, reset nonce
             nonce = 0
-
-        # time.sleep(1)
-
-        # print("Mining the next Block, Guessing the expected puzzle is " + str(nonce))
-        # response = stub.addNewBlock(blockchain_pb2.AddBlockRequest(transaction=tran_msg, nonce=nonce))
 
     def sendMessage(self, channel, message):
         stub = blockchain_pb2_grpc.BlockChainStub(channel)
-
-        # tran_msg = f"{self.miner_index} find a new Block!"
         response = stub.receiveMessage(blockchain_pb2.receiveMessageRequest(message=message))
-        # print("client MSG:", response.message)
         return response
 
     def broadcastBlock(self, block):
@@ -196,44 +169,44 @@ class bc_Miner:
         return channel_list
 
     def getUTXOs(self):
-        local_channel = grpc.insecure_channel('localhost:' + self.localport)
+        local_channel = grpc.insecure_channel('localhost:' + self.localPort)
         stub = blockchain_pb2_grpc.BlockChainStub(local_channel)
         response = stub.getUTXOs(blockchain_pb2.getUTXOsRequest(message="get UTXOs"))
         return response
 
-    def broadcastNewTransaction(transaction):
-        channel = grpc.insecure_channel('localhost:50052')
-        localchannel = grpc.insecure_channel('localhost:50051')
-        localstub = blockchain_pb2_grpc.BlockChainStub(localchannel)
+    def broadcastNewTransaction(self, transaction, receiver_port):
+        channel = grpc.insecure_channel('localhost:' + receiver_port)
+        localChannel = grpc.insecure_channel('localhost:' + self.localPort)
+        localStub = blockchain_pb2_grpc.BlockChainStub(localChannel)
 
         channel_list = [channel]
-        successadd = 0
+        successAdd = 0
 
         for c in channel_list:
             stub = blockchain_pb2_grpc.BlockChainStub(c)
-            if stub.addNewtransaction(
-                    blockchain_pb2.addNewRequest(addnew=transaction)) == 'add NewTransaction success!':
-                successadd += 1
-        if successadd > 0:
-            localstub.addNewtransaction(blockchain_pb2.addNewRequest(addnew=transaction))
+            if stub.addNewTransaction(
+                    blockchain_pb2.addNewTransactionRequest(addnew=transaction)) == 'add NewTransaction success!':
+                successAdd += 1
+        if successAdd > 0:
+            localStub.addNewTransaction(blockchain_pb2.addNewTransactionRequest(addnew=transaction))
 
     def getBlock(self, block_index):
         # get block message from other miner
         msg = f"Get Block:{block_index}"
         response_list = self.broadcastMsg(msg)
         # print("block response list", response_list)
-        requeried_block = response_list[0].newBlock
+        required_block = response_list[0].newBlock
 
         # add block into local blockchain
-        local_channel = grpc.insecure_channel('localhost:' + self.localport)
+        local_channel = grpc.insecure_channel('localhost:' + self.localPort)
         try:
-            self.sendBlock(local_channel, requeried_block)
+            self.sendBlock(local_channel, required_block)
         except:
             print("Error get block")
 
     def getBlockInfo(self, block_index):
         msg = f"Get Block:{block_index}"
-        local_channel = grpc.insecure_channel('localhost:' + self.localport)
+        local_channel = grpc.insecure_channel('localhost:' + self.localPort)
         response = self.sendMessage(local_channel, msg)
 
         return response
@@ -241,8 +214,6 @@ class bc_Miner:
 
 if __name__ == '__main__':
     logging.basicConfig()
-
     miner = bc_Miner(0)
     miner.initMiner()
-    # read from stroge and then start mining
     miner.mining()

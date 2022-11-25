@@ -1,5 +1,3 @@
-from TxIn import TxIn
-from TxOut import TxOut
 import hashlib
 from datetime import datetime
 

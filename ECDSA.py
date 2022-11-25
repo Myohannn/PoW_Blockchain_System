@@ -1,17 +1,6 @@
 from ecdsa import SigningKey, VerifyingKey, SECP256k1
 
 
-# SECP384R1
-
-
-# sk = SigningKey.generate(curve=SECP256k1)
-# vk = sk.verifying_key
-# with open("private.pem", "wb") as f:
-#     f.write(sk.to_pem())
-# with open("public.pem", "wb") as f:
-#     f.write(vk.to_pem())
-
-
 def sign(sk, message):
     signature = sk.sign(message)
     return signature
@@ -56,25 +45,3 @@ def loadKey(index):
         vk = VerifyingKey.from_pem(a)
         # print(a)
     return sk, vk
-
-# sk, vk = loadKey(1)
-# # message = b"cnm"
-# # with open("message", "wb") as f:
-# #     f.write(message)
-# # sig = sk.sign(message)
-# # with open("signature", "wb") as f:
-# #     f.write(sig)
-#
-# print("private key:",sk)
-# # print(vk)
-#
-#
-# with open("message", "rb") as f:
-#     message = f.read()
-# with open("signature", "rb") as f:
-#     sig = f.read()
-# try:
-#     vk.verify(sig, message)
-#     print("good signature")
-# except:
-#     print("BAD SIGNATURE")

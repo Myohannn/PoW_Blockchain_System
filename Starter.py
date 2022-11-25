@@ -2,16 +2,16 @@ from bc_define import *
 from bc_server import *
 from bc_client import *
 from GUI import *
-import sys
 
+import sys
 import threading
+import time
 
 
 class Starter:
     def __init__(self, minerIndex):
         # current miner
         self.minerIndex = minerIndex
-        # self.owner = bc_Miner(minerIndex)
         self.miner = None
 
     def run(self):
@@ -39,6 +39,7 @@ class myThread1(threading.Thread):
         self.port_index = port_index
 
     def run(self):
+        # get server port
         port_list = []
         f = open("portList.txt")
         line = f.readline()
@@ -46,8 +47,6 @@ class myThread1(threading.Thread):
             port_list.append(line.replace('\n', ''))
             line = f.readline()
         f.close()
-
-        # get key pair
 
         # update server side miner_index
         local_port = port_list[self.port_index]
