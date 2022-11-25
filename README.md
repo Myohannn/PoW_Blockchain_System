@@ -30,8 +30,8 @@ The block has the following basic content:
 
 ### Dynamic-difficulty Proof-of-Work Algorithm
 ### Transaction
-### Network (gRPC-python)
-### Storage (MongoDB)
+### Network
+### Storage
 
 
 
